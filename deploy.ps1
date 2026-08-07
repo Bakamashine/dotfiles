@@ -1,4 +1,6 @@
-﻿Import-Module .\DotFiles.psm1
+﻿param([switch]$force)
+
+Import-Module .\DotFiles.psm1
 
 # TODO: deploy.ps1 doesn't support the latest format of the manifest
 
@@ -10,6 +12,6 @@ if ($HomeExists -ne $True) {
     Write-Warning "HOME environment variable already exists. Not modifying the existing value."
 }
 
-Deploy-Manifest MANIFEST
+Deploy-Manifest MANIFEST -Force:$force
 
 pause

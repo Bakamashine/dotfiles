@@ -1,16 +1,28 @@
 function Symlink-File {
-    $DestPath = $args[0]
-    $SourcePath = $args[1]
+    param(
+        [Parameter(Position=0)]$DestPath,
+        [Parameter(Position=1)]$SourcePath,
+        [switch]$Force
+    )
     if (Test-Path $DestPath) {
-        Write-Warning "$DestPath is already symlinked"
-    } else {
-        if ((Get-Item $SourcePath) -is [System.IO.DirectoryInfo]) {
-            cmd /c mklink /D "$DestPath" "$SourcePath"
+        if ($Force) {
+            Write-Warning "$DestPath already exists. Removing it because of -force flag."
+            if ((Get-Item $SourcePath) -is [System.IO.DirectoryInfo]) {
+                cmd /c rmdir "$DestPath"
+            } else {
+                cmd /c del "$DestPath"
+            }
         } else {
-            cmd /c mklink "$DestPath" "$SourcePath"
+            Write-Warning "$DestPath is already symlinked"
+            return
         }
-        echo "$DestPath has been symlinked"
     }
+    if ((Get-Item $SourcePath) -is [System.IO.DirectoryInfo]) {
+        cmd /c mklink /D "$DestPath" "$SourcePath"
+    } else {
+        cmd /c mklink "$DestPath" "$SourcePath"
+    }
+    echo "$DestPath has been symlinked"
 }
 
 function Unsymlink-File {
@@ -29,7 +41,10 @@ function Unsymlink-File {
 }
 
 function Deploy-Manifest {
-    $ManifestFile = $args[0]
+    param(
+        [Parameter(Position=0)]$ManifestFile,
+        [switch]$Force
+    )
     
     echo "Deploying $ManifestFile..."
 
@@ -42,7 +57,7 @@ function Deploy-Manifest {
         $DestPath = "$EmacsHome\$DeployFile"
         switch($DeployOp) {
             "symlink" {
-                Symlink-File $DestPath $SourcePath
+                Symlink-File $DestPath $SourcePath -Force:$Force
             }
     
             "copy" {

@@ -41,6 +41,28 @@
 
 (global-set-key (kbd "M-x") 'smex)
 (global-set-key (kbd "C-c C-c M-x") 'execute-extended-command)
+(global-set-key (kbd "<C-up>") 'shrink-window)
+(global-set-key (kbd "<C-down>") 'enlarge-window)
+(global-set-key (kbd "<C-left>") 'shrink-window-horizontally)
+(global-set-key (kbd "<C-right>") 'enlarge-window-horizontally)
+(global-set-key [f8] 'eshell)
+(delete-selection-mode 't)		;Замена выделенного текста после начала ввода
+;;(global-auto-revert-mode 't)		;Автообновление буффера
+(setq default-input-method 'russian-computer)			       ;Стандартный метод переключения языка
+;; Ace window
+(use-package ace-window
+  :ensure t
+  :init (setq aw-keys '(?a ?s ?d ?f ?g ?h ?j ?k ?l)
+              aw-char-position 'left
+              aw-ignore-current nil
+              aw-leading-char-style 'char
+              aw-scope 'frame)
+  :bind (("\C-xo" . ace-window))
+  )
+;; Neo Tree
+(use-package undo-tree
+	     :ensure t
+	     :init (global-undo-tree-mode))
 
 ;;; c-mode
 (setq-default c-basic-offset 4
@@ -64,7 +86,6 @@
 (add-hook 'lisp-mode-hook        'rc/turn-on-paredit)
 (add-hook 'common-lisp-mode-hook 'rc/turn-on-paredit)
 (add-hook 'scheme-mode-hook      'rc/turn-on-paredit)
-(add-hook 'racket-mode-hook      'rc/turn-on-paredit)
 
 ;;; Emacs lisp
 (add-hook 'emacs-lisp-mode-hook
@@ -77,23 +98,6 @@
 
 (rc/require 'uxntal-mode)
 
-;;; Haskell mode
-(rc/require 'haskell-mode)
-
-(setq haskell-process-type 'cabal-new-repl)
-(setq haskell-process-log t)
-
-(add-hook 'haskell-mode-hook 'haskell-indent-mode)
-(add-hook 'haskell-mode-hook 'interactive-haskell-mode)
-(add-hook 'haskell-mode-hook 'haskell-doc-mode)
-
-(require 'basm-mode)
-
-(require 'fasm-mode)
-(add-to-list 'auto-mode-alist '("\\.asm\\'" . fasm-mode))
-
-(require 'porth-mode)
-
 (require 'noq-mode)
 
 (require 'jai-mode)
@@ -103,8 +107,6 @@
 (add-to-list 'auto-mode-alist '("\\.[b]\\'" . simpc-mode))
 
 (require 'tatr)
-
-(require 'umka-mode)
 
 (require 'c3-mode)
 
@@ -121,18 +123,11 @@
 (add-hook 'emacs-lisp-mode 'rc/set-up-whitespace-handling)
 (add-hook 'java-mode-hook 'rc/set-up-whitespace-handling)
 (add-hook 'lua-mode-hook 'rc/set-up-whitespace-handling)
-(add-hook 'rust-mode-hook 'rc/set-up-whitespace-handling)
-(add-hook 'scala-mode-hook 'rc/set-up-whitespace-handling)
 (add-hook 'markdown-mode-hook 'rc/set-up-whitespace-handling)
-(add-hook 'haskell-mode-hook 'rc/set-up-whitespace-handling)
 (add-hook 'python-mode-hook 'rc/set-up-whitespace-handling)
-(add-hook 'erlang-mode-hook 'rc/set-up-whitespace-handling)
-(add-hook 'asm-mode-hook 'rc/set-up-whitespace-handling)
-(add-hook 'fasm-mode-hook 'rc/set-up-whitespace-handling)
-(add-hook 'go-mode-hook 'rc/set-up-whitespace-handling)
-(add-hook 'nim-mode-hook 'rc/set-up-whitespace-handling)
+(add-hook 'php-mode-hook 'rc/set-up-whitespace-handling)
+(add-hook 'csharp-mode-hook 'rc/set-up-whitespace-handling)
 (add-hook 'yaml-mode-hook 'rc/set-up-whitespace-handling)
-(add-hook 'porth-mode-hook 'rc/set-up-whitespace-handling)
 
 ;;; display-line-numbers-mode
 (when (version<= "26.0.50" emacs-version)
@@ -267,7 +262,6 @@
 
 ;;; Packages that don't require configuration
 (rc/require
- 'scala-mode
  'd-mode
  'yaml-mode
  'glsl-mode
@@ -277,9 +271,7 @@
  'graphviz-dot-mode
  'clojure-mode
  'cmake-mode
- 'rust-mode
  'csharp-mode
- 'nim-mode
  'jinja2-mode
  'markdown-mode
  'purescript-mode
@@ -287,10 +279,7 @@
  'dockerfile-mode
  'toml-mode
  'nginx-mode
- 'kotlin-mode
- 'go-mode
  'php-mode
- 'racket-mode
  'qml-mode
  'ag
  'elpy
@@ -328,3 +317,5 @@ compilation-error-regexp-alist-alist
                1 2 (4) (5)))
 
 (load-file custom-file)
+
+
