@@ -163,12 +163,16 @@
 (setq dired-mouse-drag-files t)
 
 ;;; helm
-(rc/require 'helm 'helm-git-grep 'helm-ls-git)
+;; helm-git-grep is commented out because it fails to install:
+;; its dependency queue-0.2.tar is double-signed with GNU ELPA's
+;; expired 2019 key, so package.el can't verify its signature.
+(rc/require 'helm 'helm-ls-git)
+;; (rc/require 'helm-git-grep)
 
 (setq helm-ff-transformer-show-only-basename nil)
 
 (global-set-key (kbd "C-c h t") 'helm-cmd-t)
-(global-set-key (kbd "C-c h g g") 'helm-git-grep)
+;; (global-set-key (kbd "C-c h g g") 'helm-git-grep)
 (global-set-key (kbd "C-c h g l") 'helm-ls-git-ls)
 (global-set-key (kbd "C-c h f") 'helm-find)
 (global-set-key (kbd "C-c h a") 'helm-org-agenda-files-headings)
