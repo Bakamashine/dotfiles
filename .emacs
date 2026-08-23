@@ -60,9 +60,9 @@
   :bind (("\C-xo" . ace-window))
   )
 ;; Neo Tree
-(use-package undo-tree
-	     :ensure t
-	     :init (global-undo-tree-mode))
+;; (use-package undo-tree
+;; 	     :ensure t
+;; 	     :init (global-undo-tree-mode))
 
 ;;; c-mode
 (setq-default c-basic-offset 4
