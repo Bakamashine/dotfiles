@@ -12,7 +12,7 @@ WINDOWS_CONFIGS = {
 WINDOWS = 1
 LINUX = 0
 
-DEBUG = 1
+debug = 0
 
 local system;
 local separator = package.config:sub(1,1)
@@ -24,26 +24,24 @@ if separator == "/" then
         system = WINDOWS
 end
 
-function debugPrint(text)
-    if DEBUG == 1 then
-        print(text)
+function debugPrint(...)
+    if debug == 1 then
+        print(...)
     end
 end
 function pushFiles()
     if (system == WINDOWS) then
-        local powershell = "powershell -c Copy-Item "
+        local powershell = "powershell -c Copy-Item -Force -Recurse  "
         -- building command
         for i=1, #WINDOWS_CONFIGS do
-            if (#WINDOWS_CONFIGS-1 == i) then
-                powershell = powershell .. WINDOWS_CONFIGS[i]
-                break
+            powershell = powershell .. WINDOWS_CONFIGS[i]
+            if i < #WINDOWS_CONFIGS then
+                powershell = powershell .. ","
             end
-            powershell = powershell .. WINDOWS_CONFIGS[i] .. ","
-
         end
-
+    powershell = powershell .. ' $env:USERPROFILE'
         debugPrint("[pushFiles] Command: ",powershell)
-        local success, exit_type, exit_code = os.execute(powershell .. "-Force -Recurse")
+        local success, exit_type, exit_code = os.execute(powershell)
         debugPrint("[pushFiles] Status command: ", success)
         debugPrint("[pushFiles] Exit type: ", exit_type)
         debugPrint("[pushFiles] Exit code: ", exit_code)
@@ -64,67 +62,64 @@ function split(inputstr, sep)
     return t
 end
 function deleteFiles()
-
-
     if (system == WINDOWS) then
+        local handle = io.popen('powershell -c "Get-ChildItem -Path ' .. OLD_CONFIGS .. ' -File | ForEach-Object { $_.Name } | Out-String"')
+        local output = handle:read("*a")
+        handle:close()
+        local files_from_old = split(output, " ")
+        debugPrint("[deleteFiles] Files in old dir: ", table.concat(files_from_old, ", "))
+
         local env_dirs = {
-            "$env:HOME",
+            "$env:USERPROFILE",
             "$env:APPDATA"
         }
         for j=1, #env_dirs do
-            local success, exit_type, exit_code = os.execute("Get-ChildItem -File | ForEach-Object { $_.Name } | Join-String -Separator \" \"")
-            local files_from_old_dir = split(success, " ")
-
-            local powershell = "powershell -c Remove-Item -Force -Recurse "
-            for i=1, #WINDOWS_CONFIGS do
-                powershell = powershell .. WINDOWS_CONFIGS[i] .. ","
+            for i=1, #files_from_old do
+                local file = files_from_old[i]
+                local target = env_dirs[j] .. "\\" .. file
+                local cmd = 'powershell -c "Remove-Item -Force -Recurse -ErrorAction SilentlyContinue ' .. target .. '"'
+                debugPrint("[deleteFiles] Command: ", cmd)
+                local success, exit_type, exit_code = os.execute(cmd)
+                debugPrint("[deleteFiles] Deleted: ", target, " | success: ", success)
             end
-            for i=1, #files_from_old_dir do
-                if (#files_from_old_dir-1 == i) then
-                    powershell = powershell .. " " .. env_dirs[j] ..  " " .. files_from_old_dir
-                end
-                powershell = powershell .. " " .. env_dirs[j] ..  " " .. files_from_old_dir[i] .. ","
-
         end
-            debugPrint("[deleteFiles] Command: ", powershell)
-            local success, exit_type, exit_code = os.execute(powershell)
-            debugPrint("[deleteFiles] Status command: ", success)
-            debugPrint("[deleteFiles] Exit type: ", exit_type)
-            debugPrint("[deleteFiles] Exit code: ", exit_code)
-        end
-
     end
 end
 
-pushFiles()
 function printHelp()
     print("---HELP---")
-    print("help - print info about program")
-    print("clear - remove all configs and plugins")
-    print("debug - debug mode")
+    print("-help -h - print info about program")
+    print("-clear -cl - remove all configs and plugins")
+    print("-debug -d  - debug mode")
+    print("-force -f - delete old files and push newer")
 end
--- local success, exit_type, exit_code = os.execute("echo Hello")
-for i=1,#arg do
 
-    if (arg[i] == "help" or arg[i] == "h") then
+if (#arg < 1) then
+    pushFiles()
+end
+for i=1,#arg do
+    if (arg[i] == "-debug" or arg[i] == "-d") then
+        debug = 1
+    end
+    debugPrint("Flag: ", arg[i])
+
+    if (arg[i] == "-help" or arg[i] == "-h") then
         printHelp()
         return
     end
-    if (arg[i] == "debug") then
-        DEBUG = 1
-    end
 
-    if (arg[i] == "clear" or arg[i] == "cl") then
+
+    if (arg[i] == "-clear" or arg[i] == "-cl") then
         print("clearing...")
         deleteFiles()
         return
     end
 
-    if(arg[i] == "force" or arg[i] == "f") then
+    if(arg[i] == "-force" or arg[i] == "-f") then
         print("Deleting the old config and push newer")
-
+        deleteFiles()
+        pushFiles()
+        return
     end
-
-
-    pushFiles()
 end
+
