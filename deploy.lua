@@ -7,7 +7,7 @@ WINDOWS_CONFIGS = {
     ".emacs.custom.el",
     ".gitconfig",
     ".gitignore",
-    ".vimrc",
+--     ".vimrc",
 }
 WINDOWS = 1
 LINUX = 0
