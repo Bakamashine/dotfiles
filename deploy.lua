@@ -31,24 +31,16 @@ function debugPrint(...)
 end
 function pushFiles()
     if (system == WINDOWS) then
-        local powershell = "powershell -c Copy-Item -Force -Recurse  "
-        -- building command
         for i=1, #WINDOWS_CONFIGS do
-            powershell = powershell .. WINDOWS_CONFIGS[i]
-            if i < #WINDOWS_CONFIGS then
-                powershell = powershell .. ","
-            end
+            local item = WINDOWS_CONFIGS[i]
+            local powershell = 'powershell -c "Copy-Item -Force -Recurse -ErrorAction SilentlyContinue -Path ' .. item .. ' -Destination $env:USERPROFILE"'
+            debugPrint("[pushFiles] Command: ", powershell)
+            local success, exit_type, exit_code = os.execute(powershell)
+            debugPrint("[pushFiles] Status command: ", success)
+            debugPrint("[pushFiles] Exit type: ", exit_type)
+            debugPrint("[pushFiles] Exit code: ", exit_code)
         end
-    powershell = powershell .. ' $env:USERPROFILE'
-        debugPrint("[pushFiles] Command: ",powershell)
-        local success, exit_type, exit_code = os.execute(powershell)
-        debugPrint("[pushFiles] Status command: ", success)
-        debugPrint("[pushFiles] Exit type: ", exit_type)
-        debugPrint("[pushFiles] Exit code: ", exit_code)
-
-        -- linux is not support at the moment (maybe in future..)
     end
-
 end
 
 function split(inputstr, sep)
@@ -63,10 +55,10 @@ function split(inputstr, sep)
 end
 function deleteFiles()
     if (system == WINDOWS) then
-        local handle = io.popen('powershell -c "Get-ChildItem -Path ' .. OLD_CONFIGS .. ' -File | ForEach-Object { $_.Name } | Out-String"')
+        local handle = io.popen('powershell -c "Get-ChildItem -Path ' .. OLD_CONFIGS .. ' | ForEach-Object { $_.Name } | Out-String"')
         local output = handle:read("*a")
         handle:close()
-        local files_from_old = split(output, " ")
+        local files_from_old = split(output, "\n")
         debugPrint("[deleteFiles] Files in old dir: ", table.concat(files_from_old, ", "))
 
         local env_dirs = {
@@ -76,11 +68,13 @@ function deleteFiles()
         for j=1, #env_dirs do
             for i=1, #files_from_old do
                 local file = files_from_old[i]
-                local target = env_dirs[j] .. "\\" .. file
-                local cmd = 'powershell -c "Remove-Item -Force -Recurse -ErrorAction SilentlyContinue ' .. target .. '"'
-                debugPrint("[deleteFiles] Command: ", cmd)
-                local success, exit_type, exit_code = os.execute(cmd)
-                debugPrint("[deleteFiles] Deleted: ", target, " | success: ", success)
+                if file ~= "" then
+                    local target = env_dirs[j] .. "\\" .. file
+                    local cmd = 'powershell -c "Remove-Item -Force -Recurse -ErrorAction SilentlyContinue -Path ' .. target .. '"'
+                    debugPrint("[deleteFiles] Command: ", cmd)
+                    local success, exit_type, exit_code = os.execute(cmd)
+                    debugPrint("[deleteFiles] Deleted: ", target, " | success: ", success)
+                end
             end
         end
     end
