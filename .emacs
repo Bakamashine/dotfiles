@@ -105,6 +105,7 @@
 (require 'simpc-mode)
 (add-to-list 'auto-mode-alist '("\\.[hc]\\(pp\\)?\\'" . simpc-mode))
 (add-to-list 'auto-mode-alist '("\\.[b]\\'" . simpc-mode))
+(add-to-list 'auto-mode-alist '("\\.ino" . simpc-mode))
 
 (require 'tatr)
 
