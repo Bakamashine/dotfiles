@@ -112,6 +112,11 @@
 (require 'c3-mode)
 
 ;;; Whitespace mode
+;;; Don't highlight long lines in red (remove `lines', `lines-tail'
+;;; from whitespace-style).
+(setq whitespace-style
+      (delq 'lines-tail (delq 'lines (default-value 'whitespace-style))))
+
 (defun rc/set-up-whitespace-handling ()
   (interactive)
   (whitespace-mode 1)
@@ -310,6 +315,13 @@
           (lambda ()
             (interactive)
             (setq-local fill-paragraph-function 'astyle-buffer)))
+
+;;; irony
+;; (add-hook 'simpc-mode-hook 'irony-mode)
+;; (add-hook 'irony-mode-hook 'irony-cdb-autosetup-compile-options)
+;; (add-hook 'after-init-hook 'global-company-mode)
+;; (eval-after-load 'company
+;;   '(add-to-list 'company-backends 'company-irony))
 
 (require 'compile)
 
