@@ -9,6 +9,7 @@ WINDOWS_CONFIGS = {
     ".gitignore",
     ".glzr",
 --     ".vimrc",
+	"_vimrc",
 }
 WINDOWS = 1
 LINUX = 0
