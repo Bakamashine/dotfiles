@@ -7,10 +7,13 @@ WINDOWS_CONFIGS = {
     ".emacs.custom.el",
     ".gitconfig",
     ".gitignore",
-    ".glzr",
+    --".glzr",
 --     ".vimrc",
 	"_vimrc",
 }
+if (arg[0] == "glzr") then
+	table.insert(WINDOWS_CONFIGS, "glzr")
+end
 WINDOWS = 1
 LINUX = 0
 
