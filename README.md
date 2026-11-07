@@ -7,8 +7,8 @@ My Windows dotfiles — a personal i3-style setup.
 The goal is a **keyboard-driven, tiling, mouse-free desktop** on Windows:
 GlazeWM supplies the tiling window manager, Zebar replaces the taskbar with a
 configurable status bar, and Emacs is the editor. This repo holds the configs
-for all three and a small Lua script that deploys them to the right places on
-the machine.
+for all three and a small PowerShell script that deploys them to the right
+places on the machine.
 
 ## What is managed here
 
@@ -25,9 +25,9 @@ and are kept for reference rather than deleted.
 ## The convention
 
 Every entry in this repo sits at the **same relative path it occupies in
-`%USERPROFILE%`**. `deploy.lua` depends on this — it shells out to PowerShell
-`Copy-Item` and drops each configured path straight into `%USERPROFILE%`, so
-the repo path *is* the destination path:
+`%USERPROFILE%`**. `deploy.ps1` depends on this — it uses `Copy-Item` to drop
+each configured path straight into `%USERPROFILE%`, so the repo path *is* the
+destination path:
 
 ```
 dotfiles\.glzr\glazewm\config.yaml   ->   %USERPROFILE%\.glzr\glazewm\config.yaml
@@ -42,8 +42,8 @@ What you read in the repo is what is on the machine.
 ## Layout
 
 ```
-deploy.lua            the deployer (Lua 5.5; lua55.exe sits next to it)
-WINDOWS_CONFIGS       the list of paths copied to %USERPROFILE%
+deploy.ps1            the deployer (PowerShell)
+WindowsConfigs        the list of paths copied to %USERPROFILE%
 old/                  retired configs, for the -f cleanup path
 .glzr/                GlazeWM + Zebar
   glazewm/config.yaml
@@ -60,45 +60,31 @@ droppings, not configuration.
 
 ## Deploying
 
-```sh
-lua55.exe deploy.lua          # push everything to %USERPROFILE%
-lua55.exe deploy.lua -h       # help
+```powershell
+.\deploy.ps1          # push everything to %USERPROFILE%
+.\deploy.ps1 -h       # help
+```
+
+If PowerShell blocks the script because of the execution policy, run it with:
+
+```powershell
+powershell -ExecutionPolicy Bypass -File .\deploy.ps1
 ```
 
 `Copy-Item -Recurse` **merges** into an existing destination rather than
 nesting, so running the deploy repeatedly is safe — it will not create
 `~\.glzr\.glzr`.
 
-### Two known bugs in `deploy.lua`
+### Deploy notes
 
-Both pre-date the Zebar work; found while documenting the script. Neither is
-fixed yet.
-
-**1. Any argument silently skips the deploy.** `pushFiles()` is called from
-`if (#arg < 1)`, but inside the argument loop it is only ever reached via
-`-f`. So `-d` and any unrecognised flag do nothing at all — and because
-`-f` returns early, `-d -f` is the only ordering where debug output appears.
-The entry point wants to be a proper `if/elseif` chain over the flags with a
-single unconditional deploy at the end.
-
-**2. `-f` never deletes anything.** `deleteFiles()` splits the file list on a
-literal space, but PowerShell's `Out-String` separates names with newlines, so
-all of `old/` collapses into a *single* token containing embedded newlines:
-
-```
-token count = 1
-token 1 = [.apvlvrc
-.gdbinit
-.ghci
-...
-```
-
-That yields one nonsense path like `C:\Users\ivan\.apvlvrc\n.gdbinit\n...`,
-which `Remove-Item` fails on — silently, because the call passes
-`-ErrorAction SilentlyContinue`. The fix is to split on whitespace
-(`"%s+"`) rather than `" "`, and to `-split` on `\r?\n` at the source.
-
-Treat `-f` as "push only" until this is addressed.
+- If a destination is a symlink or junction (for example left over from an old
+  repo location), `deploy.ps1` removes the link itself before copying. A
+  dangling link would otherwise make `Copy-Item` fail.
+- `-d` adds debug output and still deploys.
+- `-f` removes the entries listed in `old/` from `%USERPROFILE%` and
+  `%APPDATA%`, then deploys.
+- `-cl` only removes those old entries.
+- `-glzr` also deploys `.glzr` (GlazeWM + Zebar).
 
 ---
 
@@ -274,6 +260,6 @@ the Evergreen Standalone Installer as admin:
 
 1. Install GlazeWM, then Zebar, then Emacs.
 2. Clone this repo to `%USERPROFILE%\dotfiles`.
-3. `lua55.exe deploy.lua` to push the configs.
+3. `.\deploy.ps1` to push the configs.
 4. Start Zebar once and let it fetch its webview runtime.
 5. In the Zebar GUI, confirm `my-bar` / `with-glazewm` is the startup widget.
