@@ -233,6 +233,9 @@
             (interactive)
             (company-mode 0)))
 
+;;; clangd (C/C++ completion, diagnostics)
+(load "~/.emacs.rc/clangd-rc.el")
+
 ;;; Typescript
 (rc/require 'typescript-mode)
 (add-to-list 'auto-mode-alist '("\\.mts\\'" . typescript-mode))
