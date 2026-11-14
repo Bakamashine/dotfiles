@@ -22,6 +22,7 @@ set autochdir
 set nobackup
 set noundofile
 colorscheme habamax
+set statusline+=%{&iminsert ? '[RU]' : '[EN]'}
 
 autocmd BufEnter * if &filetype == "go" | setlocal noexpandtab
 autocmd BufNewFile,BufRead ?\+.c3 setf c
