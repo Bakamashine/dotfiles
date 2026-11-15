@@ -7,7 +7,11 @@ param(
 )
 
 $OldConfigs = Join-Path $PSScriptRoot 'old'
-
+# set $vimPlugPath "$env:USERPROFILE\vimfiles\autoload"
+# [System.IO.Directory].CreateDirectory($vimPlugPath)
+# if (Test-Path  $vimPlugPath) {
+#   Invoke-WebRequest -Uri "https://raw.githubusercontent.com/junegunn/vim-plug/master/plug.vim" -OutFile "$vimPlugPath\plug.vim"
+# }
 # Every entry is a path relative to this repo. It is copied to the same
 # relative path under %USERPROFILE%.
 $WindowsConfigs = @(
