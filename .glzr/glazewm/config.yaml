@@ -225,8 +225,8 @@ keybindings:
     bindings: ['lctrl+alt+shift+space']
 
   # Change the focused window to be tiling.
-  - commands: ['toggle-tiling']
-    bindings: ['lctrl+alt+t']
+   - commands: ['toggle-tiling']
+     bindings: ['lctrl+alt+shift+t']
 
   # Change the focused window to be fullscreen.
   - commands: ['toggle-fullscreen']
