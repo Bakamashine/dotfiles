@@ -61,6 +61,9 @@ set noundofile
 colorscheme habamax
 " set statusline+=%{&iminsert ? '[RU]' : '[EN]'}
 
+inoremap <C-l> <C-^>
+cnoremap <C-l> <C-^>
+
 
 " Only for gui (Gvim)
 if has('gui_running')
