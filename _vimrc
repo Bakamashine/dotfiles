@@ -32,7 +32,7 @@ set linebreak                 " Перенос по словам
 set tabstop=2
 set shiftwidth=4
 set expandtab
-set guifont=Iosevka\ 20
+"set guifont=Iosevka\ 20
 set guioptions-=m
 set guioptions-=T
 set noesckeys
@@ -160,6 +160,7 @@ nnoremap <silent> <leader>x :x<CR>
 " Быстрая очистка подсветки поиска
 nnoremap <silent> <leader><space> :nohlsearch<CR>
 
+noremap <C-m> :make<BAR>copen<CR>
 
 " Отключаем синтаксис для очень больших файлов (>10MB)
 augroup LargeFile
